@@ -1,4 +1,7 @@
+using EmployeeAPI.Controllers;
 using EmployeeAPI.EFCore;
+using EmployeeAPI.Repositories;
+using EmployeeAPI.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DataContext>(
                 o => o.UseNpgsql(builder.Configuration.GetConnectionString("Ef_Postgres_Db"))
             );
+builder.Services.AddScoped<EmployeeRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

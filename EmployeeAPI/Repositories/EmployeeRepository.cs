@@ -1,11 +1,13 @@
 ﻿using EmployeeAPI.EFCore;
 using EmployeeAPI.Models;
+using EmployeeAPI.Repositories.Interface;
 
 namespace EmployeeAPI.Repositories
 {
-    public class EmployeeRepository
+    public class EmployeeRepository : IEmployeeRepository
     {
         private DataContext _context;
+
         public EmployeeRepository(DataContext context)
         {
             _context = context;
@@ -41,7 +43,7 @@ namespace EmployeeAPI.Repositories
         /// <summary>
         /// It serves the POST/PUT/PATCH
         /// </summary>
-        public void SaveEmployee(EmployeeModel model)
+        public int SaveEmployee(EmployeeModel model)
         {
             Employee dbTable = new Employee();
             if (model.Id > 0)
@@ -52,7 +54,11 @@ namespace EmployeeAPI.Repositories
                 {
                     dbTable.name = model.Name;
                     dbTable.jabatan = model.Jabatan;
+                    _context.SaveChanges();
+
+                    return dbTable.id;
                 }
+                return 0;
             }
             else
             {
@@ -60,21 +66,26 @@ namespace EmployeeAPI.Repositories
                 dbTable.name = model.Name;
                 dbTable.jabatan = model.Jabatan.ToString();
                 _context.Employees.Add(dbTable);
+                _context.SaveChanges();
+
+                return dbTable.id;
             }
-            _context.SaveChanges();
         }
         /// <summary>
         /// DELETE
         /// </summary>
         /// <param name="id"></param>
-        public void DeleteEmployee(int id)
+        public int DeleteEmployee(int id)
         {
             var employee = _context.Employees.Where(d => d.id.Equals(id)).FirstOrDefault();
             if (employee != null)
             {
                 _context.Employees.Remove(employee);
                 _context.SaveChanges();
+
+                return id;
             }
+            return 0;
         }
     }
 }

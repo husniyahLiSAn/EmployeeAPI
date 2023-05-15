@@ -3,6 +3,7 @@ using EmployeeAPI.Helper;
 using EmployeeAPI.Models;
 using EmployeeAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -69,7 +70,9 @@ namespace EmployeeAPI.Controllers
             try
             {
                 ResponseType type = ResponseType.Success;
-                _db.SaveEmployee(model);
+                int response = _db.SaveEmployee(model);
+                model.Id = response;
+                
                 return Ok(ResponseHandler.GetAppResponse(type, model));
             }
             catch (Exception ex)
@@ -87,7 +90,17 @@ namespace EmployeeAPI.Controllers
             try
             {
                 ResponseType type = ResponseType.Success;
-                _db.SaveEmployee(model);
+                int response = _db.SaveEmployee(model);
+
+                if (response == 0)
+                {
+                    type = ResponseType.NotFound;
+                    model = null;
+                } else
+                {
+                    model.Id = response;
+                }
+
                 return Ok(ResponseHandler.GetAppResponse(type, model));
             }
             catch (Exception ex)
@@ -104,8 +117,17 @@ namespace EmployeeAPI.Controllers
             try
             {
                 ResponseType type = ResponseType.Success;
-                _db.DeleteEmployee(id);
-                return Ok(ResponseHandler.GetAppResponse(type, "Delete Successfully"));
+                string message = null;
+                int response = _db.DeleteEmployee(id);
+
+                if (response == 0)
+                {
+                    type = ResponseType.NotFound;
+                } else
+                {
+                    message = "Delete Successfully";
+                }
+                return Ok(ResponseHandler.GetAppResponse(type, message));
             }
             catch (Exception ex)
             {
